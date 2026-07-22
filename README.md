@@ -155,13 +155,10 @@ flow (resume upload via a mocked Cloudinary call, duplicate-application preventi
 - **Database:** MongoDB Atlas (free M0 cluster)
 - **File storage:** Cloudinary
 
-The database starts empty on first visit — register a recruiter and a candidate through the app's
-own sign-up form to try the full flow, or use the admin login below (admin accounts can only be
-created via the seed script, not through public registration, so this one is provided directly):
-
-| Role  | Email            | Password         |
-|-------|------------------|-------------------|
-| Admin | admin@gmail.com  | admin@gmail.com  |
+The live database is intentionally kept empty — register a recruiter and a candidate through the
+app's own sign-up form to try the full flow. Note that admin accounts can't be created through
+public registration (by design, for security); an admin login can be provisioned on request by
+running `npm run seed` against the database.
 
 ### Cross-host deployment notes
 
