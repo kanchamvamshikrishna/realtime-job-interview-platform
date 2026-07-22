@@ -171,11 +171,17 @@ const ChatThread = ({ otherUserId }) => {
 
 export const ChatPage = () => {
   const { otherUserId } = useParams();
+  const { user } = useAuth();
+  const isSelfChat = otherUserId === user?._id;
 
   return (
     <div className="flex h-[75vh] overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
       <ConversationList activeUserId={otherUserId} />
-      {otherUserId ? (
+      {isSelfChat ? (
+        <div className="flex flex-1 items-center justify-center px-6 text-center text-gray-400">
+          You can't message yourself — pick a conversation from the list.
+        </div>
+      ) : otherUserId ? (
         <ChatThread key={otherUserId} otherUserId={otherUserId} />
       ) : (
         <div className="flex flex-1 items-center justify-center text-gray-400">

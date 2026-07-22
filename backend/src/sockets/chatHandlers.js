@@ -14,6 +14,10 @@ export const registerChatHandlers = (io, socket) => {
         return callback?.({ success: false, message: 'recipientId and content are required' });
       }
 
+      if (recipientId === socket.user._id.toString()) {
+        return callback?.({ success: false, message: 'You cannot message yourself' });
+      }
+
       const conversationId = buildConversationId(socket.user._id, recipientId);
 
       const message = await Message.create({
@@ -34,11 +38,13 @@ export const registerChatHandlers = (io, socket) => {
         createdAt: message.createdAt,
       };
 
-      // Deliver once per user room. Both participants may also be in the
-      // shared conversationId room (from join_conversation), so broadcasting
-      // there too would double-deliver to whichever one is joined.
-      io.to(userRoom(recipientId)).emit('receive_message', payload);
-      io.to(userRoom(socket.user._id)).emit('receive_message', payload);
+      // Deliver once per user room (deduped via Set — defensive in case a
+      // future caller ever allows sender === recipient again). Both
+      // participants may also be in the shared conversationId room (from
+      // join_conversation), so broadcasting there too would double-deliver
+      // to whichever one is joined.
+      const targetRooms = new Set([userRoom(recipientId), userRoom(socket.user._id)]);
+      targetRooms.forEach((room) => io.to(room).emit('receive_message', payload));
 
       callback?.({ success: true, message: payload });
     } catch (err) {
