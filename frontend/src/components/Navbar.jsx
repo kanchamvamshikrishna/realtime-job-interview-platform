@@ -3,6 +3,7 @@ import { useAuth } from '../features/auth/useAuth';
 import { useLogoutMutation } from '../features/auth/authApi';
 import { useDispatch } from 'react-redux';
 import { logout as logoutAction } from '../features/auth/authSlice';
+import { baseApi } from '../app/baseApi';
 import { DarkModeToggle } from './DarkModeToggle';
 import { disconnectSocket } from '../features/chat/socket';
 
@@ -26,6 +27,9 @@ export const Navbar = () => {
     }
     disconnectSocket();
     dispatch(logoutAction());
+    // Clear all cached query results so the next user logged into this tab
+    // never sees a previous session's conversations/applications/jobs.
+    dispatch(baseApi.util.resetApiState());
     navigate('/login');
   };
 
