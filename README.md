@@ -155,10 +155,14 @@ flow (resume upload via a mocked Cloudinary call, duplicate-application preventi
 - **Database:** MongoDB Atlas (free M0 cluster)
 - **File storage:** Cloudinary
 
-The live database is currently empty — register a recruiter and a candidate through the app's own
-sign-up form to try the full flow. Admin accounts can't be created through public registration (by
-design, for security); an admin login can be provisioned on request by running `npm run seed`
-against the database.
+Admin accounts can't be created through public registration (by design, for security) — use the
+admin login below, provisioned directly in the database. A test candidate account is also provided;
+register your own recruiter account through the app's sign-up form to try that side of the flow.
+
+| Role      | Email            | Password         |
+|-----------|------------------|-------------------|
+| Admin     | admin@gmail.com  | admin@gmail.com  |
+| Candidate | test@gmail.com   | test@gmail.com   |
 
 ### Cross-host deployment notes
 
