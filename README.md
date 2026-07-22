@@ -149,11 +149,31 @@ flow (resume upload via a mocked Cloudinary call, duplicate-application preventi
 
 ## Deployment
 
-_Fill in after deploying:_
+- **Frontend (Vercel):** https://realtime-job-interview-platform.vercel.app
+- **Backend (Railway):** https://realtime-job-interview-platform-production.up.railway.app
+- **API docs (Swagger):** https://realtime-job-interview-platform-production.up.railway.app/api-docs
+- **Database:** MongoDB Atlas (free M0 cluster)
+- **File storage:** Cloudinary
 
-- Frontend URL:
-- Backend URL:
-- Admin credentials: (use the seeded admin above, or rotate after deploying)
+The database starts empty on first visit — register a recruiter and a candidate through the app's
+own sign-up form to try the full flow, or use the admin login below (admin accounts can only be
+created via the seed script, not through public registration, so this one is provided directly):
+
+| Role  | Email            | Password         |
+|-------|------------------|-------------------|
+| Admin | admin@gmail.com  | admin@gmail.com  |
+
+### Cross-host deployment notes
+
+Because the frontend and backend are deployed on separate hosts, two things differ from local dev:
+- The frontend is built with `VITE_API_URL` pointing at the Railway backend, so RTK Query and the
+  Socket.IO client hit the deployed API directly instead of relying on Vite's dev proxy.
+- The backend runs with `CROSS_ORIGIN_COOKIES=true`, which switches the refresh-token cookie to
+  `SameSite=None; Secure` — required for the cookie to survive a cross-site request between the
+  Vercel and Railway origins (browsers drop `SameSite=Lax` cookies in that setup).
+
+Railway's free tier can spin the service down after inactivity — the first request after a period of
+no traffic may take a few extra seconds while it wakes back up.
 
 ## Notes on scope
 
