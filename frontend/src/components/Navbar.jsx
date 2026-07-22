@@ -58,7 +58,7 @@ export const Navbar = () => {
                   My Applications
                 </Link>
               )}
-              {role === 'recruiter' && (
+              {(role === 'recruiter' || role === 'admin') && (
                 <Link to="/my-jobs" className="hover:text-indigo-600 dark:hover:text-indigo-400">
                   My Jobs
                 </Link>
