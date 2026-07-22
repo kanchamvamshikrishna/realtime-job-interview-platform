@@ -23,11 +23,11 @@ export const env = {
     apiSecret: process.env.CLOUDINARY_API_SECRET,
   },
   seed: {
-    adminEmail: process.env.SEED_ADMIN_EMAIL || 'admin@kribudwebtech.com',
-    adminPassword: process.env.SEED_ADMIN_PASSWORD || 'Admin@12345',
+    adminEmail: process.env.SEED_ADMIN_EMAIL || 'admin@gmail.com',
+    adminPassword: process.env.SEED_ADMIN_PASSWORD || 'admin@gmail.com',
     recruiterEmail: process.env.SEED_RECRUITER_EMAIL || 'recruiter@kribudwebtech.com',
     recruiterPassword: process.env.SEED_RECRUITER_PASSWORD || 'Recruiter@12345',
-    candidateEmail: process.env.SEED_CANDIDATE_EMAIL || 'candidate@kribudwebtech.com',
-    candidatePassword: process.env.SEED_CANDIDATE_PASSWORD || 'Candidate@12345',
+    candidateEmail: process.env.SEED_CANDIDATE_EMAIL || 'test@gmail.com',
+    candidatePassword: process.env.SEED_CANDIDATE_PASSWORD || 'test@gmail.com',
   },
 };

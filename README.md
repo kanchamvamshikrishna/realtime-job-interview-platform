@@ -111,9 +111,9 @@ npm run dev              # http://localhost:5173, proxies /api and /socket.io to
 
 | Role      | Email                            | Password         |
 |-----------|-----------------------------------|------------------|
-| Admin     | admin@kribudwebtech.com          | Admin@12345      |
+| Admin     | admin@gmail.com                  | admin@gmail.com  |
 | Recruiter | recruiter@kribudwebtech.com      | Recruiter@12345  |
-| Candidate | candidate@kribudwebtech.com      | Candidate@12345  |
+| Candidate | test@gmail.com                   | test@gmail.com   |
 
 (Override these via `SEED_*` env vars in `backend/.env` before running `npm run seed`.)
 
