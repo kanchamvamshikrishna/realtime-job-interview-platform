@@ -1,3 +1,5 @@
+import { parse } from 'csv-parse/sync';
+import { z } from 'zod';
 import { Job } from '../models/Job.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
@@ -130,4 +132,88 @@ export const deleteJob = asyncHandler(async (req, res) => {
 export const listMyJobs = asyncHandler(async (req, res) => {
   const jobs = await Job.find({ postedBy: req.user._id }).sort({ createdAt: -1 });
   res.status(200).json(new ApiResponse(200, { jobs }));
+});
+
+const csvRowSchema = z.object({
+  title: z.string().min(2, 'title is required (min 2 chars)'),
+  description: z.string().min(10, 'description is required (min 10 chars)'),
+  company: z.string().min(1, 'company is required'),
+  location: z.string().min(1, 'location is required'),
+  type: z.enum(['full-time', 'part-time', 'contract', 'internship']).optional().or(z.literal('')),
+  skills: z.string().optional(),
+  salaryMin: z.string().optional(),
+  salaryMax: z.string().optional(),
+});
+
+/**
+ * @swagger
+ * /api/jobs/bulk-import:
+ *   post:
+ *     summary: Bulk-create job posts from a CSV file (recruiter only)
+ *     tags: [Jobs]
+ *     responses:
+ *       201:
+ *         description: Import summary with created/failed row counts
+ */
+export const bulkImportJobs = asyncHandler(async (req, res) => {
+  if (!req.file) throw new ApiError(400, 'CSV file is required');
+
+  let rows;
+  try {
+    rows = parse(req.file.buffer, { columns: true, skip_empty_lines: true, trim: true });
+  } catch (err) {
+    throw new ApiError(400, `Failed to parse CSV: ${err.message}`);
+  }
+
+  if (rows.length === 0) throw new ApiError(400, 'CSV file has no data rows');
+  if (rows.length > 200) throw new ApiError(400, 'CSV cannot contain more than 200 rows at a time');
+
+  const toCreate = [];
+  const failed = [];
+
+  rows.forEach((row, index) => {
+    const rowNumber = index + 2; // +1 for header row, +1 for 1-indexing
+    const result = csvRowSchema.safeParse(row);
+
+    if (!result.success) {
+      failed.push({
+        row: rowNumber,
+        error: result.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join('; '),
+      });
+      return;
+    }
+
+    const data = result.data;
+    const salaryMin = data.salaryMin ? Number(data.salaryMin) : undefined;
+    const salaryMax = data.salaryMax ? Number(data.salaryMax) : undefined;
+
+    if ((data.salaryMin && Number.isNaN(salaryMin)) || (data.salaryMax && Number.isNaN(salaryMax))) {
+      failed.push({ row: rowNumber, error: 'salaryMin/salaryMax must be numbers' });
+      return;
+    }
+
+    toCreate.push({
+      title: data.title,
+      description: data.description,
+      company: data.company,
+      location: data.location,
+      type: data.type || 'full-time',
+      skills: data.skills
+        ? data.skills.split(';').map((s) => s.trim()).filter(Boolean)
+        : [],
+      salaryMin,
+      salaryMax,
+      postedBy: req.user._id,
+    });
+  });
+
+  const inserted = toCreate.length > 0 ? await Job.insertMany(toCreate) : [];
+
+  res.status(201).json(
+    new ApiResponse(
+      201,
+      { createdCount: inserted.length, failedCount: failed.length, failed },
+      `Imported ${inserted.length} job(s)${failed.length ? `, ${failed.length} row(s) failed` : ''}`
+    )
+  );
 });

@@ -41,6 +41,14 @@ export const jobsApi = baseApi.injectEndpoints({
       query: (id) => ({ url: `/jobs/${id}`, method: 'DELETE' }),
       invalidatesTags: [{ type: 'Job', id: 'LIST' }, { type: 'MyJobs', id: 'LIST' }],
     }),
+    bulkImportJobs: builder.mutation({
+      query: (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return { url: '/jobs/bulk-import', method: 'POST', body: formData };
+      },
+      invalidatesTags: [{ type: 'Job', id: 'LIST' }, { type: 'MyJobs', id: 'LIST' }],
+    }),
   }),
 });
 
@@ -51,4 +59,5 @@ export const {
   useCreateJobMutation,
   useUpdateJobMutation,
   useDeleteJobMutation,
+  useBulkImportJobsMutation,
 } = jobsApi;

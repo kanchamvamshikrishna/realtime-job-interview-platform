@@ -21,3 +21,15 @@ export const uploadResume = multer({
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
 }).single('resume');
+
+const csvFileFilter = (req, file, cb) => {
+  const isCsv = file.mimetype === 'text/csv' || file.originalname.toLowerCase().endsWith('.csv');
+  if (!isCsv) return cb(new ApiError(400, 'File must be a .csv file'));
+  cb(null, true);
+};
+
+export const uploadCsv = multer({
+  storage,
+  fileFilter: csvFileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 },
+}).single('file');

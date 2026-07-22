@@ -74,4 +74,49 @@ describe('Jobs', () => {
 
     expect(res.status).toBe(403);
   });
+
+  describe('Bulk CSV import', () => {
+    const csvBody = [
+      'title,company,location,type,skills,salaryMin,salaryMax,description',
+      'Senior Backend Engineer,Acme Corp,Remote,full-time,Node.js;MongoDB,70000,100000,Own our core API services.',
+      'Bad Row,,,,,,,',
+    ].join('\n');
+
+    it('imports valid rows and reports failed rows', async () => {
+      const { token } = await registerAndLogin({ email: 'bulkrecruiter@example.com', role: 'recruiter' });
+
+      const res = await request(app)
+        .post('/api/jobs/bulk-import')
+        .set('Authorization', `Bearer ${token}`)
+        .attach('file', Buffer.from(csvBody), { filename: 'jobs.csv', contentType: 'text/csv' });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data.createdCount).toBe(1);
+      expect(res.body.data.failedCount).toBe(1);
+      expect(res.body.data.failed[0].row).toBe(3);
+    });
+
+    it('forbids a candidate from bulk-importing jobs', async () => {
+      const { token } = await registerAndLogin({ email: 'bulkcandidate@example.com', role: 'candidate' });
+
+      const res = await request(app)
+        .post('/api/jobs/bulk-import')
+        .set('Authorization', `Bearer ${token}`)
+        .attach('file', Buffer.from(csvBody), { filename: 'jobs.csv', contentType: 'text/csv' });
+
+      expect(res.status).toBe(403);
+    });
+
+    it('splits the semicolon-separated skills column into an array', async () => {
+      const { token } = await registerAndLogin({ email: 'bulkrecruiter2@example.com', role: 'recruiter' });
+
+      await request(app)
+        .post('/api/jobs/bulk-import')
+        .set('Authorization', `Bearer ${token}`)
+        .attach('file', Buffer.from(csvBody), { filename: 'jobs.csv', contentType: 'text/csv' });
+
+      const res = await request(app).get('/api/jobs/recruiter/mine').set('Authorization', `Bearer ${token}`);
+      expect(res.body.data.jobs[0].skills).toEqual(['Node.js', 'MongoDB']);
+    });
+  });
 });
