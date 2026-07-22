@@ -6,6 +6,10 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: process.env.PORT || 4000,
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  // Set to 'true' when the frontend and backend are on different hosts
+  // (e.g. Vercel + Render) — the refresh-token cookie needs SameSite=None
+  // (which requires Secure) to survive a cross-site request in that setup.
+  crossOriginCookies: process.env.CROSS_ORIGIN_COOKIES === 'true',
   mongoUri: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/job-interview-platform',
   jwt: {
     accessSecret: process.env.JWT_ACCESS_SECRET || 'dev_access_secret',

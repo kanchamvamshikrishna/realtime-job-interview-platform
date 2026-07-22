@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: job-interview-platform-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: CROSS_ORIGIN_COOKIES
+        value: true
+      # Set the rest (CLIENT_URL, MONGO_URI, JWT_*, CLOUDINARY_*, SEED_*)
+      # in the Render dashboard — they contain secrets and aren't committed.

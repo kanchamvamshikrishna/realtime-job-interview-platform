@@ -1,8 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { setAccessToken, logout } from '../features/auth/authSlice';
 
+// In dev, '/api' is proxied to localhost:4000 by Vite (see vite.config.js).
+// In production the frontend and backend are on different hosts (Vercel /
+// Render), so VITE_API_URL must point at the deployed backend's origin.
+const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
+
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: '/api',
+  baseUrl: API_BASE_URL,
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
     const token = getState().auth.accessToken;
