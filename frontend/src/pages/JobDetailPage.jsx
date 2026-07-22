@@ -20,7 +20,7 @@ export const JobDetailPage = () => {
   const job = data?.data?.job;
   if (!job) return <p>Job not found.</p>;
 
-  const isOwner = role === 'recruiter' && job.postedBy?._id === user?._id;
+  const isOwner = (role === 'recruiter' && job.postedBy?._id === user?._id) || role === 'admin';
 
   const handleApply = async (e) => {
     e.preventDefault();
