@@ -17,9 +17,9 @@ const router = Router();
 
 router.get('/', validate(listJobsSchema), listJobs);
 router.get('/recruiter/mine', verifyJWT, requireRole('recruiter', 'admin'), listMyJobs);
-router.post('/bulk-import', verifyJWT, requireRole('recruiter'), uploadCsv, bulkImportJobs);
+router.post('/bulk-import', verifyJWT, requireRole('recruiter', 'admin'), uploadCsv, bulkImportJobs);
 router.get('/:id', getJob);
-router.post('/', verifyJWT, requireRole('recruiter'), validate(createJobSchema), createJob);
+router.post('/', verifyJWT, requireRole('recruiter', 'admin'), validate(createJobSchema), createJob);
 router.put('/:id', verifyJWT, requireRole('recruiter', 'admin'), validate(updateJobSchema), updateJob);
 router.delete('/:id', verifyJWT, requireRole('recruiter', 'admin'), deleteJob);
 
